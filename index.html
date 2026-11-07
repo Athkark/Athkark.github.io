@@ -166,24 +166,25 @@
   .progress-bar{height:100%;background:var(--accent);width:0;transition:width .25s ease;}
 
   .stage{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative;cursor:pointer;user-select:none;-webkit-user-select:none;}
-  .counter-head{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:5px;padding:16px 16px 12px;background:var(--bg);border-bottom:1px solid var(--border);}
+  .counter-head{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 16px 8px;background:var(--bg);border-bottom:1px solid var(--border);}
   .scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
-  .scroll-inner{min-height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:22px 20px;box-sizing:border-box;}
+  .scroll-inner{min-height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:14px 18px;box-sizing:border-box;}
   .counter-wrap{display:flex;flex-direction:column;align-items:center;gap:6px;margin-bottom:14px;}
   .counter{
-    width:92px;height:92px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-    font-size:2.5rem;font-weight:700;color:var(--accent-ink);background:var(--accent);
-    box-shadow:0 8px 22px rgba(15,107,79,.35);transition:transform .1s ease, background .2s ease;
+    width:66px;height:66px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:1.75rem;font-weight:700;color:var(--accent-ink);background:var(--accent);
+    box-shadow:0 6px 16px rgba(15,107,79,.3);transition:transform .1s ease, background .2s ease;
     font-variant-numeric:tabular-nums;
   }
-  .counter.pulse{transform:scale(.9);}
-  .counter.done{background:var(--accent-strong);font-size:2.6rem;}
-  .counter-label{font-size:.98rem;color:var(--muted);}
-  .dhikr-live{font-size:1.9rem;font-weight:600;color:var(--text);max-width:600px;line-height:2.35;margin:0 auto;}
+  .counter.pulse{transform:scale(.88);}
+  .counter.done{background:var(--accent-strong);font-size:1.85rem;}
+  .counter-label{font-size:.82rem;color:var(--muted);}
+  .dhikr-live{font-size:1.5rem;font-weight:600;color:var(--text);max-width:640px;line-height:1.95;margin:0 auto;}
   .dhikr-live .ayah{color:var(--accent-strong);}
-  .dhikr-note{margin-top:16px;font-size:1rem;color:var(--text-soft);line-height:1.95;max-width:560px;background:var(--surface-2);border:1px solid var(--border);border-radius:16px;padding:12px 16px;}
+  .dhikr-note{margin-top:12px;font-size:.88rem;color:var(--text-soft);line-height:1.85;max-width:560px;background:var(--surface-2);border:1px solid var(--border);border-radius:14px;padding:8px 14px;}
   .dhikr-ref{margin-top:8px;font-size:.9rem;color:var(--muted);}
-  .tap-hint{flex-shrink:0;text-align:center;font-size:.92rem;color:var(--muted);padding:8px 12px 12px;pointer-events:none;}
+  .tap-hint{flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:7px;text-align:center;font-size:.82rem;color:var(--muted);padding:7px 12px calc(10px + env(safe-area-inset-bottom));pointer-events:none;background:var(--bg);border-top:1px solid var(--border);}
+  .tap-hint .touch{font-size:1rem;line-height:1;opacity:.85;}
 
   .bottombar{display:flex;gap:12px;padding:12px 16px calc(14px + env(safe-area-inset-bottom));background:var(--surface);border-top:1px solid var(--border);}
   .navbtn{flex:1;padding:14px;border-radius:16px;font-size:1.12rem;font-weight:700;background:var(--surface-2);color:var(--text);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;gap:8px;}
@@ -219,7 +220,6 @@
   .visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);border:0;}
 
   @media (min-width:640px){
-    .dhikr-live{font-size:2.15rem;}
     .brand{font-size:3rem;}
   }
   @media (prefers-reduced-motion: reduce){
@@ -265,7 +265,7 @@
         <div class="dhikr-ref" id="dhikr-ref" hidden></div>
       </div>
     </div>
-    <div class="tap-hint" id="tap-hint">المس الشاشة للعدّ</div>
+    <div class="tap-hint" id="tap-hint"><span class="touch" aria-hidden="true">👆</span><span id="tap-hint-text">المس الشاشة للعدّ</span></div>
   </div>
 
   <div class="bottombar">
@@ -551,6 +551,7 @@
     done: document.getElementById("done"),
     tapArea: document.getElementById("tap-area"),
     scroll: document.getElementById("scroll"),
+    scrollInner: document.querySelector("#scroll .scroll-inner"),
     counter: document.getElementById("counter"),
     counterLabel: document.getElementById("counter-label"),
     live: document.getElementById("dhikr-live"),
@@ -560,7 +561,7 @@
     modeText: document.getElementById("reader-mode-text"),
     progressChip: document.getElementById("reader-progress-chip"),
     progressBar: document.getElementById("progress-bar"),
-    hint: document.getElementById("tap-hint"),
+    hint: document.getElementById("tap-hint-text"),
     btnPrev: document.getElementById("btn-prev"),
     btnNext: document.getElementById("btn-next"),
     doneSub: document.getElementById("done-sub")
@@ -590,6 +591,29 @@
     renderCounter();
     renderProgress();
     if(el.scroll){ el.scroll.scrollTop = 0; }
+    fitTextSoon();
+  }
+
+  // Shrink the dhikr text so the whole thing fits on screen without scrolling.
+  function fitText(){
+    if(!el.scroll || !el.scrollInner) return;
+    var avail = el.scroll.clientHeight;
+    if(avail <= 0) return;
+    var max = window.innerWidth >= 640 ? 40 : 30;
+    var min = 14;
+    var size = max;
+    el.live.style.fontSize = size + "px";
+    var guard = 0;
+    while(el.scrollInner.scrollHeight > avail && size > min && guard < 60){
+      size -= 1;
+      el.live.style.fontSize = size + "px";
+      guard++;
+    }
+  }
+  function fitTextSoon(){
+    requestAnimationFrame(function(){
+      requestAnimationFrame(fitText);
+    });
   }
 
   function renderCounter(){
@@ -672,6 +696,16 @@
   window.addEventListener("popstate", function(){
     if(el.done.classList.contains("active")){ goHome(); }
     else if(el.reader.classList.contains("active")){ goHome(); }
+  });
+
+  var resizeTimer;
+  window.addEventListener("resize", function(){
+    if(!el.reader.classList.contains("active")) return;
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(fitText, 120);
+  });
+  window.addEventListener("orientationchange", function(){
+    if(el.reader.classList.contains("active")) setTimeout(fitText, 220);
   });
 
   document.body.classList.add("js-ready");

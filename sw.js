@@ -1,5 +1,5 @@
 /* أذكارك - Service Worker (offline-first) */
-const CACHE = "athkark-v7";
+const CACHE = "athkark-v8";
 const ASSETS = [
   "./",
   "./index.html",

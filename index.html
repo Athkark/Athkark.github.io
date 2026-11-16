@@ -789,15 +789,23 @@
     }
     var ios = /iphone|ipad|ipod/i.test(navigator.userAgent) ||
               (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-    var txt = ios
-      ? "لتثبيت التطبيق على الآيفون/الآيباد:\n١) اضغط زر المشاركة في متصفح Safari.\n٢) اختر «إضافة إلى الشاشة الرئيسية».\n\nبعدها يعمل كتطبيق بدون إنترنت."
-      : "لتثبيت التطبيق:\nافتح قائمة المتصفح (⋮) واختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية».\n\nبعدها يعمل كتطبيق بدون إنترنت.";
-    showInstallHelp(txt);
+    showInstallHelp(ios);
   }
-  function showInstallHelp(txt){
+  function showInstallHelp(ios){
     var m = document.getElementById("install-help");
     var t = document.getElementById("install-help-text");
-    if(t) t.textContent = txt;
+    var shareIc = '<svg viewBox="0 0 24 24" fill="none" stroke="#007aff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px;vertical-align:-6px"><path d="M12 15V3"/><path d="M8 7l4-4 4 4"/><path d="M6 11H5a2 2 0 00-2 2v6a2 2 0 002 2h14a2 2 0 002-2v-6a2 2 0 00-2-2h-1"/></svg>';
+    if(t){
+      if(ios){
+        t.innerHTML = 'ثبّته كتطبيق بخطوتين سهلتين:'
+          + '<br><br>١) اضغط زر المشاركة ' + shareIc + ' في أسفل Safari.'
+          + '<br>٢) اختر «إضافة إلى الشاشة الرئيسية».'
+          + '<br><br>وبيصير عندك تطبيق يفتح بدون إنترنت.';
+      } else {
+        t.innerHTML = 'افتح قائمة المتصفح (⋮) واختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية».'
+          + '<br><br>وبيصير عندك تطبيق يفتح بدون إنترنت.';
+      }
+    }
     if(m) m.hidden = false;
   }
 

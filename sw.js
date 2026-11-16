@@ -1,10 +1,11 @@
 /* أذكارك - Service Worker (offline-first) */
-const CACHE = "athkark-v8";
+const CACHE = "athkark-v9";
 const ASSETS = [
   "./",
   "./index.html",
   "./manifest.json",
   "./logo.png",
+  "./cover.jpg",
   "./icon-192.png",
   "./icon-512.png",
   "./icon-maskable-512.png",

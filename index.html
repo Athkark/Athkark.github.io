@@ -711,7 +711,6 @@
     <div class="qr-subbar">
       <button class="iconbtn" id="qr-tolist" aria-label="قائمة السور">↩</button>
       <span class="qr-sname" id="qr-sname"></span>
-      <button class="qr-listen" id="qr-listen" type="button">🔊 استماع</button>
     </div>
     <div class="qr-stage" id="qr-stage">
       <div class="qr-page-card"><img class="qr-img" id="qr-img" alt="صفحة المصحف" draggable="false"></div>
@@ -1207,12 +1206,6 @@
     document.getElementById("qr-tolist").addEventListener("click", function(){ qrReader.classList.remove("active"); });
     document.getElementById("qr-prev").addEventListener("click", function(){ gotoPage(curPage - 1); });
     document.getElementById("qr-next").addEventListener("click", function(){ gotoPage(curPage + 1); });
-    document.getElementById("qr-listen").addEventListener("click", function(){
-      qrScreen.classList.remove("active");
-      qrScreen.setAttribute("aria-hidden","true");
-      openQuran();
-      playSurah(surahOfPage(curPage));
-    });
     var tsX=0, tsY=0;
     qrStage.addEventListener("touchstart", function(e){ var t=e.changedTouches[0]; tsX=t.clientX; tsY=t.clientY; }, {passive:true});
     qrStage.addEventListener("touchend", function(e){ var t=e.changedTouches[0]; var dx=t.clientX-tsX, dy=t.clientY-tsY; if(Math.abs(dx)>60 && Math.abs(dx)>Math.abs(dy)*1.4){ gotoPage(curPage + (dx<0?1:-1)); } }, {passive:true});

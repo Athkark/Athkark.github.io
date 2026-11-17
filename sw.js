@@ -1,5 +1,5 @@
 /* أذكارك - Service Worker (offline-first) */
-const CACHE = "athkark-v11";
+const CACHE = "athkark-v12";
 const ASSETS = [
   "./",
   "./index.html",
@@ -31,6 +31,9 @@ self.addEventListener("activate", (e) => {
 self.addEventListener("fetch", (e) => {
   const req = e.request;
   if (req.method !== "GET") return;
+
+  // Quran audio: let the browser stream directly (range requests), never cache.
+  if (req.url.indexOf("/quran/") !== -1) return;
 
   // Navigations (the HTML app shell): network-first so updates show,
   // fall back to cache when offline.

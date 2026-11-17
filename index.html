@@ -259,6 +259,31 @@
   .done-sub{font-size:1.15rem;color:var(--text-soft);margin:0 0 10px;}
   .done-actions{display:flex;flex-direction:column;gap:12px;width:100%;max-width:360px;}
 
+  /* ---------- Quran ---------- */
+  #quran{position:fixed;inset:0;display:none;flex-direction:column;background:var(--bg);z-index:35;}
+  #quran.active{display:flex;}
+  .qtopbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:calc(12px + env(safe-area-inset-top)) 16px 12px;background:var(--surface);border-bottom:1px solid var(--border);}
+  .qtitle{font-size:1.08rem;font-weight:700;color:var(--text);}
+  .qgrid{flex:1;overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;padding:16px;align-content:start;}
+  .qcard{position:relative;display:flex;flex-direction:column;align-items:center;gap:5px;padding:16px 10px;border-radius:16px;background:var(--surface);background-image:var(--bevel);border:1px solid var(--border);box-shadow:var(--shadow-3d);cursor:pointer;transition:transform .14s ease, box-shadow .14s ease;}
+  .qcard:active{transform:translateY(2px) scale(.98);box-shadow:var(--shadow-3d-press);}
+  .qcard.playing{box-shadow:0 0 0 2px var(--accent), var(--shadow-3d);}
+  .qnum{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.92rem;color:var(--accent-ink);background:var(--gloss), var(--accent);box-shadow:0 7px 14px -5px rgba(0,0,0,.4), inset 0 2px 4px rgba(255,255,255,.35);text-shadow:0 1px 2px rgba(0,0,0,.25);font-variant-numeric:tabular-nums;}
+  .qname{font-weight:700;font-size:1.1rem;color:var(--text);line-height:1.4;}
+  .qmeta{font-size:.76rem;color:var(--muted);}
+  .qcard .qplay-ic{position:absolute;top:9px;inset-inline-start:10px;font-size:.85rem;color:var(--accent);opacity:0;}
+  .qcard.playing .qplay-ic{opacity:1;}
+
+  .qplayer{flex-shrink:0;padding:10px 16px calc(12px + env(safe-area-inset-bottom));background:var(--surface);border-top:1px solid var(--border);box-shadow:0 -8px 20px rgba(0,0,0,.14);}
+  .qp-info{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px;}
+  .qp-name{font-weight:700;font-size:1.02rem;color:var(--text);}
+  .qp-time{font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums;direction:ltr;}
+  .qp-seek{width:100%;accent-color:var(--accent);height:5px;cursor:pointer;direction:ltr;}
+  .qp-controls{display:flex;align-items:center;justify-content:center;gap:24px;margin-top:8px;}
+  .qp-btn{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.15rem;background:var(--surface-2);background-image:var(--bevel);color:var(--text);border:1px solid var(--border);box-shadow:0 6px 12px -6px rgba(0,0,0,.3);transition:transform .12s ease;}
+  .qp-btn:active{transform:scale(.93);}
+  .qp-play{width:58px;height:58px;font-size:1.5rem;background:var(--accent);color:var(--accent-ink);border-color:transparent;box-shadow:0 10px 20px -6px rgba(15,107,79,.5);}
+
   /* ---------- Static SEO content (shown when JS disabled) ---------- */
   .seo-content{padding:8px 4px 40px;}
   .seo-content .intro{font-size:1.05rem;color:var(--text-soft);}
@@ -294,7 +319,7 @@
   <span class="sep" aria-hidden="true">|</span>
   <a href="#" data-nav="soon">أذكار متنوعة</a>
   <span class="sep" aria-hidden="true">|</span>
-  <a href="#" data-nav="soon">القرآن الكريم</a>
+  <a href="#" data-nav="quran">القرآن الكريم</a>
   <span class="sep" aria-hidden="true">|</span>
   <a href="#" data-nav="soon">إنشاء صدقة جارية</a>
   <span class="sep" aria-hidden="true">|</span>
@@ -624,6 +649,26 @@
   </footer>
 </div>
 
+<!-- ======================= QURAN SCREEN ======================= -->
+<section id="quran" aria-hidden="true">
+  <div class="qtopbar">
+    <button class="iconbtn" id="q-back" aria-label="العودة للرئيسية">⌂</button>
+    <div class="qtitle">القرآن الكريم · بصوت ماهر المعيقلي</div>
+    <span style="width:44px;flex-shrink:0" aria-hidden="true"></span>
+  </div>
+  <div class="qgrid" id="q-grid"></div>
+  <div class="qplayer" id="q-player" hidden>
+    <div class="qp-info"><span class="qp-name" id="qp-name">—</span><span class="qp-time" id="qp-time">0:00 / 0:00</span></div>
+    <input type="range" class="qp-seek" id="qp-seek" min="0" max="1000" value="0" step="1" aria-label="موضع التشغيل">
+    <div class="qp-controls">
+      <button class="qp-btn" id="qp-prev" type="button" aria-label="السورة السابقة">⏮</button>
+      <button class="qp-btn qp-play" id="qp-play" type="button" aria-label="تشغيل أو إيقاف">▶</button>
+      <button class="qp-btn" id="qp-next" type="button" aria-label="السورة التالية">⏭</button>
+    </div>
+  </div>
+  <audio id="q-audio" preload="none"></audio>
+</section>
+
 <div class="modal-overlay" id="install-help" hidden>
   <div class="modal">
     <h3 class="modal-title">تثبيت التطبيق</h3>
@@ -915,11 +960,124 @@
     Array.prototype.forEach.call(document.querySelectorAll(".topnav [data-nav]"), function(a){
       a.addEventListener("click", function(e){
         e.preventDefault();
-        if(a.getAttribute("data-nav") === "home"){ goHome(); }
+        var nav = a.getAttribute("data-nav");
+        if(nav === "home"){ goHome(); }
+        else if(nav === "quran"){ openQuran(); }
         else { showToast("هذا القسم قريباً إن شاء الله"); }
       });
     });
   })();
+
+  // ---------- Quran ----------
+  var SURAHS = ["الفاتحة","البقرة","آل عمران","النساء","المائدة","الأنعام","الأعراف","الأنفال","التوبة","يونس","هود","يوسف","الرعد","إبراهيم","الحِجر","النحل","الإسراء","الكهف","مريم","طه","الأنبياء","الحج","المؤمنون","النور","الفرقان","الشعراء","النمل","القصص","العنكبوت","الروم","لقمان","السجدة","الأحزاب","سبأ","فاطر","يس","الصافات","ص","الزمر","غافر","فصلت","الشورى","الزخرف","الدخان","الجاثية","الأحقاف","محمد","الفتح","الحجرات","ق","الذاريات","الطور","النجم","القمر","الرحمن","الواقعة","الحديد","المجادلة","الحشر","الممتحنة","الصف","الجمعة","المنافقون","التغابن","الطلاق","التحريم","الملك","القلم","الحاقة","المعارج","نوح","الجن","المزمل","المدثر","القيامة","الإنسان","المرسلات","النبأ","النازعات","عبس","التكوير","الانفطار","المطففين","الانشقاق","البروج","الطارق","الأعلى","الغاشية","الفجر","البلد","الشمس","الليل","الضحى","الشرح","التين","العلق","القدر","البينة","الزلزلة","العاديات","القارعة","التكاثر","العصر","الهُمَزة","الفيل","قريش","الماعون","الكوثر","الكافرون","النصر","المسد","الإخلاص","الفلق","الناس"];
+  var qAudio = document.getElementById("q-audio");
+  var qGrid = document.getElementById("q-grid");
+  var qPlayer = document.getElementById("q-player");
+  var qpName = document.getElementById("qp-name");
+  var qpTime = document.getElementById("qp-time");
+  var qpSeek = document.getElementById("qp-seek");
+  var qpPlay = document.getElementById("qp-play");
+  var qScreen = document.getElementById("quran");
+  var qCur = 0, qGridBuilt = false, qSeeking = false;
+
+  function pad3(n){ return (n < 10 ? "00" : n < 100 ? "0" : "") + n; }
+  function fmtTime(s){ s = Math.floor(s || 0); var m = Math.floor(s/60), ss = s%60; return m + ":" + (ss<10?"0":"") + ss; }
+
+  function buildQGrid(){
+    if(qGridBuilt) return;
+    var html = "";
+    for(var i=0;i<SURAHS.length;i++){
+      var n = i+1;
+      html += '<div class="qcard" data-s="'+n+'" role="button" tabindex="0" aria-label="تشغيل سورة '+SURAHS[i]+'">'
+            +   '<span class="qplay-ic" aria-hidden="true">▶</span>'
+            +   '<span class="qnum">'+ar(n)+'</span>'
+            +   '<span class="qname">'+SURAHS[i]+'</span>'
+            +   '<span class="qmeta">سورة رقم '+ar(n)+'</span>'
+            + '</div>';
+    }
+    qGrid.innerHTML = html;
+    Array.prototype.forEach.call(qGrid.querySelectorAll(".qcard"), function(c){
+      var n = parseInt(c.getAttribute("data-s"),10);
+      c.addEventListener("click", function(){ playSurah(n); });
+      c.addEventListener("keydown", function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); playSurah(n); } });
+    });
+    qGridBuilt = true;
+  }
+
+  function openQuran(){
+    buildQGrid();
+    el.home.style.display = "none";
+    qScreen.classList.add("active");
+    qScreen.setAttribute("aria-hidden","false");
+    window.scrollTo(0,0);
+  }
+  function closeQuran(){
+    qScreen.classList.remove("active");
+    qScreen.setAttribute("aria-hidden","true");
+    goHome();
+  }
+
+  function highlightQCard(){
+    Array.prototype.forEach.call(qGrid.querySelectorAll(".qcard"), function(c){
+      c.classList.toggle("playing", parseInt(c.getAttribute("data-s"),10) === qCur);
+    });
+  }
+
+  function playSurah(n){
+    if(n < 1 || n > 114) return;
+    qCur = n;
+    qAudio.src = "quran/" + pad3(n) + ".mp3";
+    qAudio.play().catch(function(){});
+    qPlayer.hidden = false;
+    qpName.textContent = "سورة " + SURAHS[n-1];
+    qpTime.textContent = "0:00 / 0:00";
+    qpSeek.value = 0;
+    highlightQCard();
+    setMediaSession(n);
+  }
+  function togglePlay(){
+    if(!qCur){ playSurah(1); return; }
+    if(qAudio.paused){ qAudio.play().catch(function(){}); } else { qAudio.pause(); }
+  }
+  function nextSurah(){ playSurah(qCur >= 114 ? 1 : qCur + 1); }
+  function prevSurah(){ playSurah(qCur <= 1 ? 114 : qCur - 1); }
+
+  function setMediaSession(n){
+    if("mediaSession" in navigator){
+      try{
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: "سورة " + SURAHS[n-1],
+          artist: "ماهر المعيقلي",
+          album: "القرآن الكريم — أذكارك"
+        });
+        navigator.mediaSession.setActionHandler("play", function(){ qAudio.play(); });
+        navigator.mediaSession.setActionHandler("pause", function(){ qAudio.pause(); });
+        navigator.mediaSession.setActionHandler("previoustrack", prevSurah);
+        navigator.mediaSession.setActionHandler("nexttrack", nextSurah);
+      }catch(e){}
+    }
+  }
+
+  if(qpPlay){
+    qpPlay.addEventListener("click", togglePlay);
+    document.getElementById("qp-next").addEventListener("click", nextSurah);
+    document.getElementById("qp-prev").addEventListener("click", prevSurah);
+    document.getElementById("q-back").addEventListener("click", closeQuran);
+    qAudio.addEventListener("play", function(){ qpPlay.textContent = "⏸"; });
+    qAudio.addEventListener("pause", function(){ qpPlay.textContent = "▶"; });
+    qAudio.addEventListener("ended", nextSurah);
+    qAudio.addEventListener("timeupdate", function(){
+      if(!qSeeking && qAudio.duration){
+        qpSeek.value = (qAudio.currentTime / qAudio.duration * 1000) || 0;
+        qpTime.textContent = fmtTime(qAudio.currentTime) + " / " + fmtTime(qAudio.duration);
+      }
+    });
+    qpSeek.addEventListener("input", function(){ qSeeking = true; });
+    qpSeek.addEventListener("change", function(){
+      if(qAudio.duration){ qAudio.currentTime = qpSeek.value / 1000 * qAudio.duration; }
+      qSeeking = false;
+    });
+  }
 
   var resizeTimer;
   window.addEventListener("resize", function(){

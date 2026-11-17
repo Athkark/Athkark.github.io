@@ -143,7 +143,14 @@
   h1,h2,h3{line-height:1.6;}
 
   /* ---------- Home ---------- */
-  #home{min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:28px 16px calc(28px + env(safe-area-inset-bottom));gap:10px;}
+  #home{min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:calc(72px + env(safe-area-inset-top)) 16px calc(28px + env(safe-area-inset-bottom));gap:10px;}
+
+  .topnav{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;align-items:center;gap:1px;justify-content:flex-start;padding:calc(9px + env(safe-area-inset-top)) 10px 9px;overflow-x:auto;white-space:nowrap;background:rgba(18,20,24,.44);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,.12);scrollbar-width:none;}
+  .topnav::-webkit-scrollbar{display:none;}
+  .topnav a{flex-shrink:0;color:#fdf7ec;text-decoration:none;font-weight:600;font-size:.96rem;padding:7px 11px;border-radius:10px;transition:background .15s ease;}
+  .topnav a:active{background:rgba(255,255,255,.16);}
+  .topnav a.active{background:rgba(255,255,255,.2);}
+  .topnav .sep{flex-shrink:0;color:rgba(255,255,255,.32);font-size:.85rem;}
   .logo{width:148px;height:148px;object-fit:contain;filter:drop-shadow(0 8px 24px rgba(15,42,36,.22));margin-bottom:6px;}
   .brand{font-size:2.6rem;font-weight:700;margin:0;color:#fdf7ec;letter-spacing:.5px;}
   .tagline{font-size:1.12rem;color:var(--text-soft);margin:0 0 20px;line-height:1.8;}
@@ -280,6 +287,19 @@
 </style>
 </head>
 <body>
+
+<!-- ======================= TOP NAV BANNER ======================= -->
+<nav class="topnav" aria-label="التنقل الرئيسي">
+  <a href="#" data-nav="home" class="active">الصفحة الرئيسية</a>
+  <span class="sep" aria-hidden="true">|</span>
+  <a href="#" data-nav="soon">أذكار متنوعة</a>
+  <span class="sep" aria-hidden="true">|</span>
+  <a href="#" data-nav="soon">القرآن الكريم</a>
+  <span class="sep" aria-hidden="true">|</span>
+  <a href="#" data-nav="soon">إنشاء صدقة جارية</a>
+  <span class="sep" aria-hidden="true">|</span>
+  <a href="#" data-nav="soon">من نحن</a>
+</nav>
 
 <!-- ======================= HOME SCREEN ======================= -->
 <main id="home">
@@ -891,6 +911,14 @@
     var ihc = document.getElementById("install-help-close");
     if(ihc) ihc.addEventListener("click", function(){ if(ih) ih.hidden = true; });
     if(ih) ih.addEventListener("click", function(e){ if(e.target === ih) ih.hidden = true; });
+
+    Array.prototype.forEach.call(document.querySelectorAll(".topnav [data-nav]"), function(a){
+      a.addEventListener("click", function(e){
+        e.preventDefault();
+        if(a.getAttribute("data-nav") === "home"){ goHome(); }
+        else { showToast("هذا القسم قريباً إن شاء الله"); }
+      });
+    });
   })();
 
   var resizeTimer;

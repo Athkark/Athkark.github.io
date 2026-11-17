@@ -152,12 +152,12 @@
   .nav-links{display:flex;align-items:center;gap:2px;}
   .nav-links a{color:#fdf7ec;text-decoration:none;font-weight:600;font-size:.95rem;padding:7px 11px;border-radius:10px;white-space:nowrap;transition:background .15s ease;}
   .nav-links a:active,.nav-links a.active{background:rgba(255,255,255,.2);}
-  @media (max-width:599px){
+  @media (max-width:899px){
     .nav-links{position:absolute;top:100%;left:0;right:0;flex-direction:column;align-items:stretch;gap:2px;background:rgba(15,17,21,.97);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.12);padding:6px 10px 10px;max-height:0;overflow:hidden;opacity:0;pointer-events:none;transition:max-height .25s ease, opacity .2s ease;}
-    .nav-links.open{max-height:400px;opacity:1;pointer-events:auto;}
+    .nav-links.open{max-height:460px;opacity:1;pointer-events:auto;}
     .nav-links a{padding:13px 12px;border-radius:12px;font-size:1.06rem;}
   }
-  @media (min-width:600px){
+  @media (min-width:900px){
     .nav-toggle,.nav-brand{display:none;}
   }
   .logo{width:148px;height:148px;object-fit:contain;filter:drop-shadow(0 8px 24px rgba(15,42,36,.22));margin-bottom:6px;}
@@ -293,6 +293,23 @@
   .qp-btn:active{transform:scale(.93);}
   .qp-play{width:58px;height:58px;font-size:1.5rem;background:var(--accent);color:var(--accent-ink);border-color:transparent;box-shadow:0 10px 20px -6px rgba(15,107,79,.5);}
 
+  /* ---------- Quran reading ---------- */
+  @font-face{font-family:'Amiri Quran';src:url('AmiriQuran.woff2') format('woff2');font-display:swap;}
+  #quran-read{position:fixed;inset:0;display:none;flex-direction:column;background:var(--bg);z-index:35;}
+  #quran-read.active{display:flex;}
+  .qr-search{flex-shrink:0;padding:12px 16px 2px;}
+  .qr-search input{width:100%;padding:11px 15px;border-radius:14px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);font-family:inherit;font-size:1rem;}
+  .qreader{position:absolute;inset:0;display:none;flex-direction:column;background:var(--bg);}
+  .qreader.active{display:flex;}
+  .qr-subbar{display:flex;align-items:center;gap:10px;padding:calc(10px + env(safe-area-inset-top)) 16px 10px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;}
+  .qr-sname{flex:1;font-weight:700;font-size:1.14rem;color:var(--text);}
+  .qr-listen{display:flex;align-items:center;gap:6px;padding:9px 15px;border-radius:12px;font-weight:700;font-size:.95rem;background:var(--accent);background-image:var(--bevel);color:var(--accent-ink);border:none;box-shadow:0 7px 15px -5px rgba(15,107,79,.5);}
+  .qr-listen:active{transform:scale(.96);}
+  .qr-body{flex:1;overflow-y:auto;padding:24px 18px calc(44px + env(safe-area-inset-bottom));}
+  .qr-bism{font-family:'Amiri Quran',serif;text-align:center;font-size:1.65rem;color:var(--accent-strong);margin:0 0 22px;line-height:2;}
+  .quran-text{font-family:'Amiri Quran','Noto Naskh Arabic',serif;font-size:1.8rem;line-height:2.6;text-align:justify;text-align-last:center;color:var(--text);}
+  .ayah-no{display:inline-block;min-width:1.85em;height:1.85em;line-height:1.85em;text-align:center;font-size:.58em;background:var(--gloss), var(--accent);color:var(--accent-ink);border-radius:50%;margin:0 .35em;vertical-align:.3em;font-family:"Noto Naskh Arabic",sans-serif;box-shadow:0 3px 7px -2px rgba(0,0,0,.35);font-variant-numeric:tabular-nums;}
+
   /* ---------- Static SEO content (shown when JS disabled) ---------- */
   .seo-content{padding:8px 4px 40px;}
   .seo-content .intro{font-size:1.05rem;color:var(--text-soft);}
@@ -329,7 +346,8 @@
   <div class="nav-links" id="nav-links">
     <a href="#" data-nav="home" class="active">الصفحة الرئيسية</a>
     <a href="#" data-nav="soon">أذكار متنوعة</a>
-    <a href="#" data-nav="quran">القرآن الكريم</a>
+    <a href="#" data-nav="quran-read">القرآن الكريم (قراءة)</a>
+    <a href="#" data-nav="quran">القرآن الكريم (استماع)</a>
     <a href="#" data-nav="soon">إنشاء صدقة جارية</a>
     <a href="#" data-nav="soon">من نحن</a>
   </div>
@@ -678,6 +696,25 @@
   <audio id="q-audio" preload="none"></audio>
 </section>
 
+<!-- ======================= QURAN READING SCREEN ======================= -->
+<section id="quran-read" aria-hidden="true">
+  <div class="qtopbar">
+    <button class="iconbtn" id="qr-home" aria-label="العودة للرئيسية">⌂</button>
+    <div class="qtitle">القرآن الكريم · قراءة</div>
+    <span style="width:44px;flex-shrink:0" aria-hidden="true"></span>
+  </div>
+  <div class="qr-search"><input type="search" id="qr-search-input" placeholder="ابحث عن سورة…" aria-label="بحث عن سورة"></div>
+  <div class="qgrid" id="qr-grid"></div>
+  <div class="qreader" id="qr-reader">
+    <div class="qr-subbar">
+      <button class="iconbtn" id="qr-tolist" aria-label="قائمة السور">↩</button>
+      <span class="qr-sname" id="qr-sname"></span>
+      <button class="qr-listen" id="qr-listen" type="button">🔊 استماع</button>
+    </div>
+    <div class="qr-body" id="qr-body"></div>
+  </div>
+</section>
+
 <div class="modal-overlay" id="install-help" hidden>
   <div class="modal">
     <h3 class="modal-title">تثبيت التطبيق</h3>
@@ -982,6 +1019,7 @@
         var nav = a.getAttribute("data-nav");
         if(nav === "home"){ goHome(); }
         else if(nav === "quran"){ openQuran(); }
+        else if(nav === "quran-read"){ openQuranRead(); }
         else { showToast("هذا القسم قريباً إن شاء الله"); }
       });
     });
@@ -1096,6 +1134,92 @@
       if(qAudio.duration){ qAudio.currentTime = qpSeek.value / 1000 * qAudio.duration; }
       qSeeking = false;
     });
+  }
+
+  // ---------- Quran reading ----------
+  var qrScreen = document.getElementById("quran-read");
+  var qrGrid = document.getElementById("qr-grid");
+  var qrReader = document.getElementById("qr-reader");
+  var qrBody = document.getElementById("qr-body");
+  var qrSname = document.getElementById("qr-sname");
+  var qrSearch = document.getElementById("qr-search-input");
+  var QDATA = null, qrBuilt = false, curRead = 0;
+  var BISM = "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ";
+
+  function buildQRGrid(){
+    if(qrBuilt) return;
+    var html = "";
+    for(var i=0;i<SURAHS.length;i++){
+      var n = i+1;
+      html += '<div class="qcard" data-s="'+n+'" role="button" tabindex="0" aria-label="قراءة سورة '+SURAHS[i]+'">'
+            +   '<span class="qnum">'+ar(n)+'</span>'
+            +   '<span class="qname">'+SURAHS[i]+'</span>'
+            +   '<span class="qmeta">اضغط للقراءة</span>'
+            + '</div>';
+    }
+    qrGrid.innerHTML = html;
+    Array.prototype.forEach.call(qrGrid.querySelectorAll(".qcard"), function(c){
+      var n = parseInt(c.getAttribute("data-s"),10);
+      c.addEventListener("click", function(){ openSurahText(n); });
+      c.addEventListener("keydown", function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); openSurahText(n); } });
+    });
+    qrBuilt = true;
+  }
+  function openQuranRead(){
+    buildQRGrid();
+    el.home.style.display = "none";
+    qrScreen.classList.add("active");
+    qrScreen.setAttribute("aria-hidden","false");
+    qrReader.classList.remove("active");
+    window.scrollTo(0,0);
+  }
+  function closeQuranRead(){
+    qrScreen.classList.remove("active");
+    qrScreen.setAttribute("aria-hidden","true");
+    goHome();
+  }
+  function renderSurahText(n){
+    var ay = (QDATA && QDATA[n]) || [];
+    qrSname.textContent = "سورة " + SURAHS[n-1];
+    var html = "";
+    if(n !== 1 && n !== 9){ html += '<div class="qr-bism">' + BISM + '</div>'; }
+    html += '<div class="quran-text">';
+    for(var i=0;i<ay.length;i++){ html += ay[i] + '<span class="ayah-no">' + ar(i+1) + '</span>'; }
+    html += '</div>';
+    qrBody.innerHTML = html;
+    qrBody.scrollTop = 0;
+  }
+  function openSurahText(n){
+    curRead = n;
+    qrReader.classList.add("active");
+    if(QDATA){ renderSurahText(n); return; }
+    qrSname.textContent = "سورة " + SURAHS[n-1];
+    qrBody.innerHTML = '<div style="text-align:center;color:var(--muted);padding:34px 10px">جارٍ تحميل النص…</div>';
+    fetch("quran-text.json")
+      .then(function(r){ return r.json(); })
+      .then(function(j){ QDATA = j; if(curRead === n) renderSurahText(n); })
+      .catch(function(){ qrBody.innerHTML = '<div style="text-align:center;color:var(--muted);padding:34px 10px">تعذّر تحميل النص — تأكد من الاتصال بالإنترنت لأول مرة.</div>'; });
+  }
+  if(qrScreen){
+    document.getElementById("qr-home").addEventListener("click", closeQuranRead);
+    document.getElementById("qr-tolist").addEventListener("click", function(){ qrReader.classList.remove("active"); });
+    document.getElementById("qr-listen").addEventListener("click", function(){
+      qrScreen.classList.remove("active");
+      qrScreen.setAttribute("aria-hidden","true");
+      openQuran();
+      playSurah(curRead);
+    });
+    if(qrSearch){
+      qrSearch.addEventListener("input", function(){
+        var q = qrSearch.value.trim();
+        Array.prototype.forEach.call(qrGrid.querySelectorAll(".qcard"), function(c){
+          var n = c.getAttribute("data-s");
+          var name = SURAHS[parseInt(n,10)-1];
+          var show = !q || name.indexOf(q) > -1 || ar(n).indexOf(q) > -1 || n.indexOf(q) > -1;
+          c.style.display = show ? "" : "none";
+        });
+      });
+    }
   }
 
   var resizeTimer;

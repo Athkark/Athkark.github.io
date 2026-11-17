@@ -145,12 +145,21 @@
   /* ---------- Home ---------- */
   #home{min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:calc(72px + env(safe-area-inset-top)) 16px calc(28px + env(safe-area-inset-bottom));gap:10px;}
 
-  .topnav{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;align-items:center;gap:1px;justify-content:flex-start;padding:calc(9px + env(safe-area-inset-top)) 10px 9px;overflow-x:auto;white-space:nowrap;background:rgba(18,20,24,.44);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,.12);scrollbar-width:none;}
-  .topnav::-webkit-scrollbar{display:none;}
-  .topnav a{flex-shrink:0;color:#fdf7ec;text-decoration:none;font-weight:600;font-size:.96rem;padding:7px 11px;border-radius:10px;transition:background .15s ease;}
-  .topnav a:active{background:rgba(255,255,255,.16);}
-  .topnav a.active{background:rgba(255,255,255,.2);}
-  .topnav .sep{flex-shrink:0;color:rgba(255,255,255,.32);font-size:.85rem;}
+  .topnav{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;align-items:center;gap:10px;padding:calc(8px + env(safe-area-inset-top)) 14px 8px;background:rgba(18,20,24,.5);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,.12);}
+  .nav-toggle{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.1);color:#fdf7ec;font-size:1.25rem;border:1px solid rgba(255,255,255,.15);flex-shrink:0;}
+  .nav-toggle:active{background:rgba(255,255,255,.2);}
+  .nav-brand{color:#fdf7ec;font-weight:700;font-size:1.12rem;}
+  .nav-links{display:flex;align-items:center;gap:2px;}
+  .nav-links a{color:#fdf7ec;text-decoration:none;font-weight:600;font-size:.95rem;padding:7px 11px;border-radius:10px;white-space:nowrap;transition:background .15s ease;}
+  .nav-links a:active,.nav-links a.active{background:rgba(255,255,255,.2);}
+  @media (max-width:599px){
+    .nav-links{position:absolute;top:100%;left:0;right:0;flex-direction:column;align-items:stretch;gap:2px;background:rgba(15,17,21,.97);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.12);padding:6px 10px 10px;max-height:0;overflow:hidden;opacity:0;pointer-events:none;transition:max-height .25s ease, opacity .2s ease;}
+    .nav-links.open{max-height:400px;opacity:1;pointer-events:auto;}
+    .nav-links a{padding:13px 12px;border-radius:12px;font-size:1.06rem;}
+  }
+  @media (min-width:600px){
+    .nav-toggle,.nav-brand{display:none;}
+  }
   .logo{width:148px;height:148px;object-fit:contain;filter:drop-shadow(0 8px 24px rgba(15,42,36,.22));margin-bottom:6px;}
   .brand{font-size:2.6rem;font-weight:700;margin:0;color:#fdf7ec;letter-spacing:.5px;}
   .tagline{font-size:1.12rem;color:var(--text-soft);margin:0 0 20px;line-height:1.8;}
@@ -315,15 +324,15 @@
 
 <!-- ======================= TOP NAV BANNER ======================= -->
 <nav class="topnav" aria-label="التنقل الرئيسي">
-  <a href="#" data-nav="home" class="active">الصفحة الرئيسية</a>
-  <span class="sep" aria-hidden="true">|</span>
-  <a href="#" data-nav="soon">أذكار متنوعة</a>
-  <span class="sep" aria-hidden="true">|</span>
-  <a href="#" data-nav="quran">القرآن الكريم</a>
-  <span class="sep" aria-hidden="true">|</span>
-  <a href="#" data-nav="soon">إنشاء صدقة جارية</a>
-  <span class="sep" aria-hidden="true">|</span>
-  <a href="#" data-nav="soon">من نحن</a>
+  <button class="nav-toggle" id="nav-toggle" type="button" aria-label="القائمة" aria-expanded="false">☰</button>
+  <span class="nav-brand">أذكارك</span>
+  <div class="nav-links" id="nav-links">
+    <a href="#" data-nav="home" class="active">الصفحة الرئيسية</a>
+    <a href="#" data-nav="soon">أذكار متنوعة</a>
+    <a href="#" data-nav="quran">القرآن الكريم</a>
+    <a href="#" data-nav="soon">إنشاء صدقة جارية</a>
+    <a href="#" data-nav="soon">من نحن</a>
+  </div>
 </nav>
 
 <!-- ======================= HOME SCREEN ======================= -->
@@ -957,9 +966,19 @@
     if(ihc) ihc.addEventListener("click", function(){ if(ih) ih.hidden = true; });
     if(ih) ih.addEventListener("click", function(e){ if(e.target === ih) ih.hidden = true; });
 
+    var navToggle = document.getElementById("nav-toggle");
+    var navLinks = document.getElementById("nav-links");
+    if(navToggle && navLinks){
+      navToggle.addEventListener("click", function(){
+        var open = navLinks.classList.toggle("open");
+        navToggle.setAttribute("aria-expanded", open ? "true" : "false");
+      });
+    }
     Array.prototype.forEach.call(document.querySelectorAll(".topnav [data-nav]"), function(a){
       a.addEventListener("click", function(e){
         e.preventDefault();
+        if(navLinks){ navLinks.classList.remove("open"); }
+        if(navToggle){ navToggle.setAttribute("aria-expanded","false"); }
         var nav = a.getAttribute("data-nav");
         if(nav === "home"){ goHome(); }
         else if(nav === "quran"){ openQuran(); }
